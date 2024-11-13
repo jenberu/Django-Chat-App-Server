@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 class Room(models.Model):
     name=models.CharField(max_length=100,unique=True)
     def __str__(self):
-        return self.username
+        return self.name
 
 class Message(models.Model):
     room = models.ForeignKey(Room, related_name="chat_messages", on_delete=models.PROTECT)

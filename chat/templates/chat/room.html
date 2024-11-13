@@ -1,168 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Chat Room - {{ room.name }}</title>
     <style>
-        /* General Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      /* General Reset */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f2f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
 
-        .chat-container {
-            width: 90%;
-            max-width: 600px;
-            background: #ffffff;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+      .chat-container {
+        width: 90%;
+        max-width: 600px;
+        background: #ffffff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
 
-        /* Chat Messages */
-        #chat {
-            padding: 1rem;
-            overflow-y: auto;
-            flex: 1;
-            background-color: #f9f9f9;
-        }
+      /* Chat Messages */
+      #chat {
+        padding: 1rem;
+        overflow-y: auto;
+        flex: 1;
+        background-color: #f9f9f9;
+      }
 
-        .message {
-            padding: 0.8rem;
-            margin: 0.5rem 0;
-            border-radius: 10px;
-            max-width: 80%;
-            word-wrap: break-word;
-            font-size: 0.9rem;
-        }
+      .message {
+        padding: 0.8rem;
+        margin: 0.5rem 0;
+        border-radius: 10px;
+        max-width: 80%;
+        word-wrap: break-word;
+        font-size: 0.9rem;
+      }
 
-        .message.sent {
-            background-color: #d1e7dd;
-            margin-right:auto;
-            color: #0d6efd;
-            width:50%;
-        }
+      .message.sent {
+        background-color: #d1e7dd;
+        margin-right: auto;
+        color: #0d6efd;
+        width: 50%;
+      }
 
-        .message.received {
-            background-color: lightgreen;
-            margin-left:auto;
-            color: #842029;
-            width:50%;
+      .message.received {
+        background-color: lightgreen;
+        margin-left: auto;
+        color: #842029;
+        width: 50%;
+      }
 
-        }
+      /* Chat Input */
+      #chat-input {
+        display: flex;
+        border-top: 1px solid #ddd;
+        padding: 0.5rem;
+        background-color: #ffffff;
+      }
 
-        /* Chat Input */
-        #chat-input {
-            display: flex;
-            border-top: 1px solid #ddd;
-            padding: 0.5rem;
-            background-color: #ffffff;
-        }
+      #chat-message-input {
+        flex: 1;
+        padding: 0.7rem;
+        font-size: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-right: 0.5rem;
+      }
 
-        #chat-message-input {
-            flex: 1;
-            padding: 0.7rem;
-            font-size: 1rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-right: 0.5rem;
-        }
+      #chat-message-submit {
+        background-color: #007bff;
+        border: none;
+        color: #fff;
+        padding: 0.7rem 1.5rem;
+        font-size: 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
 
-        #chat-message-submit {
-            background-color: #007bff;
-            border: none;
-            color: #fff;
-            padding: 0.7rem 1.5rem;
-            font-size: 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        #chat-message-submit:hover {
-            background-color: #0056b3;
-        }
+      #chat-message-submit:hover {
+        background-color: #0056b3;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <div class="chat-container">
+      <!-- Chat Messages Section -->
+      <div id="chat">
+        {% for message in latest_messages %}
+        <div
+          class="message {% if message.user == request.user %}sent{% else %} received{% endif %}"
+        >
+          <strong>{{ message.user.username }}</strong>
+          <span class="date"> {{ message.sent_on|date:"Y.m.d H:i A" }} </span>
+          <br />
+          {{ message.content }}
+        </div>
+        {% endfor %}
+      </div>
 
-<div class="chat-container">
-    <!-- Chat Messages Section -->
-    <div id="chat"></div>
-
-    <!-- Chat Input Section -->
-    <div id="chat-input">
-        <input id="chat-message-input" type="text" placeholder="Type your message here...">
-        <input id="chat-message-submit" type="submit" value="Send">
+      <!-- Chat Input Section -->
+      <div id="chat-input">
+        <input
+          id="chat-message-input"
+          type="text"
+          placeholder="Type your message here..."
+        />
+        <input id="chat-message-submit" type="submit" value="Send" />
+      </div>
     </div>
-</div>
 
-<!-- Room ID and User for JavaScript -->
-{{ room.id|json_script:"room-id" }}
-{{ request.user.username|json_script:"request-user" }}
+    <!-- Room ID and User for JavaScript -->
+    {{ room.id|json_script:"room-id" }}
+    {{ request.user.username|json_script:"request-user" }}
 
-<script>
-    const roomID = JSON.parse(document.getElementById('room-id').textContent);
-    const requestUser = JSON.parse(document.getElementById('request-user').textContent);
-    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-    const chatSocket = new WebSocket(protocol + window.location.host + '/ws/chat/room/' + roomID + '/');
+    <script>
+      const roomID = JSON.parse(document.getElementById("room-id").textContent);
+      const requestUser = JSON.parse(
+        document.getElementById("request-user").textContent
+      );
+      const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+      const chatSocket = new WebSocket(
+        `${protocol}${window.location.host}/ws/chat/room/${roomID}/`
+      );
 
-    const chatBox = document.getElementById('chat');
-    const messageInput = document.getElementById('chat-message-input');
-    const submitButton = document.getElementById('chat-message-submit');
+      const chatBox = document.getElementById("chat");
+      const messageInput = document.getElementById("chat-message-input");
+      const submitButton = document.getElementById("chat-message-submit");
 
-    // Function to add a message to the chat box
-    function addMessage(content, user, datetime, isSent) {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message', isSent ? 'sent' : 'received');
+      // Function to add a message to the chat box
+      function addMessage(content, user, datetime, isSent) {
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("message", isSent ? "sent" : "received");
         messageElement.innerHTML = `<strong>${user}</strong> <span class="date">${datetime}</span><br>${content}`;
         chatBox.appendChild(messageElement);
         chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
-    }
+      }
 
-    // Handle incoming WebSocket messages
-    chatSocket.onmessage = function (e) {
+      // Handle incoming WebSocket messages
+      chatSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
-        const dateOptions = {hour: 'numeric', minute: 'numeric', hour12: true};
-        const datetime = new Date(data.datetime).toLocaleString('en', dateOptions);
+        const dateOptions = { hour: "numeric", minute: "numeric", hour12: true };
+        const datetime = new Date(data.datetime).toLocaleTimeString("en", dateOptions);
         const isMe = data.user === requestUser;
-        addMessage(data.message, isMe ? 'Me' : data.user, datetime, isMe);
-    };
+        addMessage(data.message, isMe ? "Me" : data.user, datetime, isMe);
+      };
 
-    chatSocket.onclose = function () {
-        console.error('Chat socket closed unexpectedly');
-    };
+      chatSocket.onclose = function () {
+        console.error("Chat socket closed unexpectedly");
+      };
 
-    // Send message on button click
-    submitButton.onclick = function () {
+      chatSocket.onerror = function (error) {
+        console.error("WebSocket error: ", error);
+      };
+
+      // Send message on button click
+      submitButton.onclick = function () {
         const message = messageInput.value.trim();
         if (message) {
-            chatSocket.send(JSON.stringify({ 'message': message }));
-            messageInput.value = ''; // Clear input
-            messageInput.focus();
+          chatSocket.send(JSON.stringify({ message: message }));
+          messageInput.value = ""; // Clear input
+          messageInput.focus();
         }
-    };
+      };
 
-    // Send message on Enter key press
-    messageInput.addEventListener("keypress", function (e) {
-        if (e.key === 'Enter') {
-            submitButton.click();
+      // Send message on Enter key press
+      messageInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          submitButton.click();
         }
-    });
-</script>
-
-</body>
+      });
+    </script>
+  </body>
 </html>

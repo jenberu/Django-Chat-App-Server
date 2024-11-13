@@ -15,4 +15,7 @@ def chat_room(request,id=None):
    except Room.DoesNotExist:
  # user is not a student of the course or course does not exist
      return HttpResponseForbidden()
-   return render(request, 'chat/room.html', {'room': room})
+   latest_messages=room.chat_messages.select_related('user').order_by('-id')[:5]
+   #reverse the message in chronological order
+   latest_messages=reversed(latest_messages)
+   return render(request, 'chat/room.html', {'room': room,'latest_messages': latest_messages})
