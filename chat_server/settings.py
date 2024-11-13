@@ -71,6 +71,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'chat_server.wsgi.application'
 ASGI_APPLICATION = 'chat_server.asgi.application'
+CHANNEL_LAYERS = {
+ 'default': {
+ 'BACKEND': 'channels_redis.core.RedisChannelLayer',
+ 'CONFIG': {
+ 'hosts': [('127.0.0.1', 6379)],
+ },
+ },
+}
 
 
 
