@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Room - {{ room.name }}</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .chat-container {
+            width: 90%;
+            max-width: 600px;
+            background: #ffffff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Chat Messages */
+        #chat {
+            padding: 1rem;
+            overflow-y: auto;
+            flex: 1;
+            background-color: #f9f9f9;
+        }
+
+        .message {
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border-radius: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+        }
+
+        .message.sent {
+            background-color: #d1e7dd;
+            align-self: flex-end;
+            color: #0d6efd;
+        }
+
+        .message.received {
+            background-color: #f8d7da;
+            align-self: flex-start;
+            color: #842029;
+        }
+
+        /* Chat Input */
+        #chat-input {
+            display: flex;
+            border-top: 1px solid #ddd;
+            padding: 0.5rem;
+            background-color: #ffffff;
+        }
+
+        #chat-message-input {
+            flex: 1;
+            padding: 0.7rem;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-right: 0.5rem;
+        }
+
+        #chat-message-submit {
+            background-color: #007bff;
+            border: none;
+            color: #fff;
+            padding: 0.7rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #chat-message-submit:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-container">
+    <!-- Chat Messages Section -->
+    <div id="chat"></div>
+
+    <!-- Chat Input Section -->
+    <div id="chat-input">
+        <input id="chat-message-input" type="text" placeholder="Type your message here...">
+        <input id="chat-message-submit" type="submit" value="Send">
+    </div>
+</div>
+
+<!-- Room ID for JavaScript -->
+{{ room.id|json_script:"room-id" }}
+
+<script>
+    // JavaScript for handling WebSocket and real-time chat functionality
+    const roomID = JSON.parse(document.getElementById('room-id').textContent);
+    const url = 'ws://' + window.location.host + '/ws/chat/room/' + roomID + '/';
+    const chatSocket = new WebSocket(url);
+
+    const chatBox = document.getElementById('chat');
+    const messageInput = document.getElementById('chat-message-input');
+    const submitButton = document.getElementById('chat-message-submit');
+
+    // Append message to chat window
+    function addMessage(message, sent = true) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', sent ? 'sent' : 'received');
+        messageElement.innerText = message;
+        chatBox.appendChild(messageElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // WebSocket Message Handler
+    chatSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        addMessage(data.message, false); // Received message
+    };
+
+    chatSocket.onclose = function (e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    // Send message on button click
+    submitButton.onclick = function (e) {
+        const message = messageInput.value;
+        if (message.trim()) {
+            chatSocket.send(JSON.stringify({ 'message': message }));
+            addMessage(message, true); // Sent message
+            messageInput.value = ''; // Clear input
+        }
+    };
+
+    // Send message on Enter key press
+    messageInput.addEventListener("keypress", function (e) {
+        if (e.key === 'Enter') {
+            submitButton.click();
+        }
+    });
+</script>
+
+</body>
+</html>
