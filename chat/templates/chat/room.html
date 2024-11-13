@@ -51,14 +51,17 @@
 
         .message.sent {
             background-color: #d1e7dd;
-            align-self: flex-end;
+            margin-right:auto;
             color: #0d6efd;
+            width:50%;
         }
 
         .message.received {
-            background-color: red;
-            align-self: flex-start;
+            background-color: lightgreen;
+            margin-left:auto;
             color: #842029;
+            width:50%;
+
         }
 
         /* Chat Input */
@@ -107,45 +110,49 @@
     </div>
 </div>
 
-<!-- Room ID for JavaScript -->
+<!-- Room ID and User for JavaScript -->
 {{ room.id|json_script:"room-id" }}
+{{ request.user.username|json_script:"request-user" }}
 
 <script>
-    // JavaScript for handling WebSocket and real-time chat functionality
     const roomID = JSON.parse(document.getElementById('room-id').textContent);
-    const url = 'ws://' + window.location.host + '/ws/chat/room/' + roomID + '/';
-    const chatSocket = new WebSocket(url);
+    const requestUser = JSON.parse(document.getElementById('request-user').textContent);
+    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    const chatSocket = new WebSocket(protocol + window.location.host + '/ws/chat/room/' + roomID + '/');
 
     const chatBox = document.getElementById('chat');
     const messageInput = document.getElementById('chat-message-input');
     const submitButton = document.getElementById('chat-message-submit');
 
-    // Append message to chat window
-    function addMessage(message, sent = true) {
+    // Function to add a message to the chat box
+    function addMessage(content, user, datetime, isSent) {
         const messageElement = document.createElement('div');
-        messageElement.classList.add('message', sent ? 'sent' : 'received');
-        messageElement.innerText = message;
+        messageElement.classList.add('message', isSent ? 'sent' : 'received');
+        messageElement.innerHTML = `<strong>${user}</strong> <span class="date">${datetime}</span><br>${content}`;
         chatBox.appendChild(messageElement);
-        chatBox.scrollTop = chatBox.scrollHeight;
+        chatBox.scrollTop = chatBox.scrollHeight; // Scroll to bottom
     }
 
-    // WebSocket Message Handler
+    // Handle incoming WebSocket messages
     chatSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
-        addMessage(data.message, false); // Received message
+        const dateOptions = {hour: 'numeric', minute: 'numeric', hour12: true};
+        const datetime = new Date(data.datetime).toLocaleString('en', dateOptions);
+        const isMe = data.user === requestUser;
+        addMessage(data.message, isMe ? 'Me' : data.user, datetime, isMe);
     };
 
-    chatSocket.onclose = function (e) {
+    chatSocket.onclose = function () {
         console.error('Chat socket closed unexpectedly');
     };
 
     // Send message on button click
-    submitButton.onclick = function (e) {
-        const message = messageInput.value;
-        if (message.trim()) {
+    submitButton.onclick = function () {
+        const message = messageInput.value.trim();
+        if (message) {
             chatSocket.send(JSON.stringify({ 'message': message }));
-            addMessage(message, true); // Sent message
             messageInput.value = ''; // Clear input
+            messageInput.focus();
         }
     };
 
