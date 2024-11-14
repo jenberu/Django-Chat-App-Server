@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'chat',
+    'rest_framework',
+    # 'rest_framework_simplejwt',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +55,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'chat_server.urls'
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default backend
+    'accounts.backends.EmailOrUsernameBackend',    # Your custom backend
+]
 
 TEMPLATES = [
     {
