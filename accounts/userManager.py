@@ -1,7 +1,7 @@
 from django.http import Http404
 from django.contrib.auth.models import BaseUserManager
 from django.core.exceptions import ObjectDoesNotExist
-class userManager(BaseUserManager):
+class UserManager(BaseUserManager):
     def get_user_by_id(self,user_id):
         try:
             instance=self.get(public_id=user_id)
