@@ -3,10 +3,13 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.utils import timezone
 from .models import Message
+
 class ChatConsumer(AsyncWebsocketConsumer):
    async def connect(self):#called when new connection is recived
        self.user=self.scope['user']
-       print(' self.user', self.user)
+       if self.user.is_anonymous:  # Check if the user is authenticated
+            await self.close()  # Reject the connection for unauthenticated users
+            return
 
        # retrieves the room_id from the WebSocket connection’s UR
        self.id=self.scope['url_route']['kwargs']['room_id']
