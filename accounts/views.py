@@ -53,14 +53,15 @@ class RegisterViewSet(viewsets.ViewSet):
          },status=status.HTTP_201_CREATED)
 
 class LoginViewSet(viewsets.ViewSet):
+
     serializer_class = LoginSerializer
     permission_classes = (AllowAny,)
     http_method_names = ['post']
     def create(self, request, *args, **kwargs):
         serializer =self.serializer_class(data=request.data)
+
         try:
             serializer.is_valid(raise_exception=True)
-
 
         except TokenError as e:
             raise InvalidToken(e.args[0])

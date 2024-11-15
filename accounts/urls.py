@@ -5,7 +5,7 @@ router=routers.DefaultRouter()
 router.register(r'user',UserViewSet,basename='user')
 router.register(r'register', RegisterViewSet,basename='register')
 router.register(r'login', LoginViewSet, basename='login')
-router.register(r'refresh', RefreshViewSet,basename='refresh')
+router.register(r'token/refresh', RefreshViewSet,basename='refresh')
 urlpatterns = [
     path('',include(router.urls)),
 ]
