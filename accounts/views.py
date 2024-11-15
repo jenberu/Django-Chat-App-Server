@@ -1,5 +1,5 @@
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework import viewsets
 from .serializers import UserSerializer
 from .models import User
@@ -9,6 +9,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import RegisterSerializer,LoginSerializer
 from rest_framework_simplejwt.exceptions import InvalidToken,TokenError
 from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework.views import APIView
 
 
 from rest_framework.pagination import PageNumberPagination
@@ -30,6 +31,15 @@ class UserViewSet(viewsets.ModelViewSet):
             return obj
         except Http404:
             raise Http404("User with this public ID does not exist.")
+class UserProfileView(APIView)  :
+    permission_classes = [IsAuthenticated]
+    def get(self,request,pk=None):
+       
+        try:
+            user=request.user
+            return Response(UserSerializer(user).data) 
+        except User.DoesNotExist:   
+            return Response({"detail":"User not found"},status=status.HTTP_404_NOT_FOUND) 
 class RegisterViewSet(viewsets.ViewSet):
      serializer_class = RegisterSerializer
      permission_classes=[AllowAny]
