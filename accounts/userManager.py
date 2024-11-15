@@ -22,7 +22,7 @@ class UserManager(BaseUserManager):
     def create_superuser(self,username=None,email=None,password=None,**kwargs):
         user=self.create_user(username=username,password=password,email=email,**kwargs)
         user.is_superuser=True
-        user.is_staff=True
+        user.is_staff = True
         user.save(using=self._db)
         return user
 

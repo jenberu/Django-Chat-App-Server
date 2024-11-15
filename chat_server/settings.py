@@ -26,6 +26,8 @@ SECRET_KEY = 'django-insecure-=%09fo=^3*9&(bq6!e4uuber+qq*+(@+(pxjw*re7q8uu6gf$j
 DEBUG = True
 
 ALLOWED_HOSTS = []
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 
 # Application definition
@@ -40,8 +42,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'chat',
     'rest_framework',
-    # 'rest_framework_simplejwt',
+    'rest_framework_simplejwt',
     'accounts',
+    'corsheaders',
+
 ]
 
 MIDDLEWARE = [
@@ -52,13 +56,26 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+     'corsheaders.middleware.CorsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'chat_server.urls'
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',  # Default backend
-    'accounts.backends.EmailOrUsernameBackend',    # Your custom backend
-]
+# AUTHENTICATION_BACKENDS = [
+#     'django.contrib.auth.backends.ModelBackend',  # Default backend
+#     'accounts.backends.EmailOrUsernameBackend',    # Your custom backend
+# ]
+AUTH_USER_MODEL='accounts.User'
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+#     'DEFAULT_FILTER_BACKENDS':
+#  ['django_filters.rest_framework.DjangoFilterBackend'],
+}
 
 TEMPLATES = [
     {

@@ -6,6 +6,7 @@ from .models import Message
 class ChatConsumer(AsyncWebsocketConsumer):
    async def connect(self):#called when new connection is recived
        self.user=self.scope['user']
+       print(' self.user', self.user)
 
        # retrieves the room_id from the WebSocket connection’s UR
        self.id=self.scope['url_route']['kwargs']['room_id']
@@ -26,6 +27,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # json.loads() to load the received JSON data into a Python dictionary
          text_data_json=json.loads(text_data)
          message=text_data_json['message']
+
          #send message to a group
          await self.channel_layer.group_send(self.room_group_name,
                                                       {
