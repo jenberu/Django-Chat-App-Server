@@ -65,7 +65,6 @@ class RegisterViewSet(viewsets.ViewSet):
             }, status=status.HTTP_201_CREATED)
 
         except ValidationError as e:
-            print("error at ValidationError ",e.detail)
             return Response({
                 "errors": e.detail  # Returns detailed error messages from serializer
             }, status=status.HTTP_400_BAD_REQUEST)
@@ -78,11 +77,11 @@ class RegisterViewSet(viewsets.ViewSet):
             }, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginViewSet(viewsets.ViewSet):
-
     serializer_class = LoginSerializer
     permission_classes = (AllowAny,)
     http_method_names = ['post']
     def create(self, request, *args, **kwargs):
+
         serializer =self.serializer_class(data=request.data)
 
         try:
@@ -90,6 +89,7 @@ class LoginViewSet(viewsets.ViewSet):
 
         except TokenError as e:
             raise InvalidToken(e.args[0])
+        
         return Response(serializer.validated_data,status=status.HTTP_200_OK)   
 
 class RefreshViewSet(viewsets.ViewSet, TokenRefreshView):
