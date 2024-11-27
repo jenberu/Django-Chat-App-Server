@@ -47,6 +47,7 @@ class RegisterViewSet(viewsets.ViewSet):
      #create method is called when the view is accessed via a POST request.
      def create(self,request,*args,**kwargs):
          serializer=self.serializer_class(data=request.data)
+         print(request.data)
          serializer.is_valid(raise_exception=True)
          #riggers the create method defined in the RegisterSerializer
          user=serializer.save()

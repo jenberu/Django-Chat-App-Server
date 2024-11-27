@@ -10,14 +10,14 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
        model = User
        fields = ['id', 'username', 'first_name',
-                'last_name', 'bio', 'avatar', 'email',
+                'last_name', 'email',
                 'is_active', 'created', 'updated']
        read_only_fields = ['is_active']
 class RegisterSerializer(UserSerializer):
     password = serializers.CharField(max_length=128,min_length=8, write_only=True, required=True)
     class Meta:
         model=User
-        fields = ['id', 'bio', 'avatar', 'email',
+        fields = ['id', 'email',
                 'username', 'first_name', 'last_name',
                 'password']
     def create(self, validated_data):#This method is called when the serializer.save() method is executed 

@@ -61,10 +61,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'chat_server.urls'
-# AUTHENTICATION_BACKENDS = [
-#     'django.contrib.auth.backends.ModelBackend',  # Default backend
-#     'accounts.backends.EmailOrUsernameBackend',    # Your custom backend
-# ]
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default backend
+    # 'accounts.backends.EmailOrUsernameBackend',    # Your custom backend
+]
 AUTH_USER_MODEL='accounts.User'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [

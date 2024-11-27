@@ -9,8 +9,8 @@ class User(AbstractBaseUser, PermissionsMixin):
    last_name = models.CharField(max_length=255)
 
    email=models.EmailField(db_index=True,unique=True,)
-   bio = models.TextField(blank=True, null=True)  # Optional bio field (text)
-   avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
+#    bio = models.TextField(blank=True, null=True)  # Optional bio field (text)
+#    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
    is_active=models.BooleanField(default=True)
    is_staff=models.BooleanField(default=False)
    created=models.DateTimeField(auto_now_add=True)
