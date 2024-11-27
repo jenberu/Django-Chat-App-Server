@@ -65,12 +65,13 @@ class RegisterViewSet(viewsets.ViewSet):
             }, status=status.HTTP_201_CREATED)
 
         except ValidationError as e:
-            # Handle validation errors (e.g., invalid input data)
+            print("error at ValidationError ",e.detail)
             return Response({
                 "errors": e.detail  # Returns detailed error messages from serializer
             }, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
+
             # Handle unexpected errors
             return Response({
                 "errors": str(e)
