@@ -10,7 +10,7 @@ from .serializers import RegisterSerializer,LoginSerializer
 from rest_framework_simplejwt.exceptions import InvalidToken,TokenError
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework.views import APIView
-
+from rest_framework.exceptions import ValidationError
 
 from rest_framework.pagination import PageNumberPagination
 class CustomPagination(PageNumberPagination):
@@ -41,27 +41,40 @@ class UserProfileView(APIView)  :
         except User.DoesNotExist:   
             return Response({"detail":"User not found"},status=status.HTTP_404_NOT_FOUND) 
 class RegisterViewSet(viewsets.ViewSet):
-     serializer_class = RegisterSerializer
-     permission_classes=[AllowAny]
-     http_method_names=['post']
-     #create method is called when the view is accessed via a POST request.
-     def create(self,request,*args,**kwargs):
-         serializer=self.serializer_class(data=request.data)
-         print(request.data)
-         serializer.is_valid(raise_exception=True)
-         #riggers the create method defined in the RegisterSerializer
-         user=serializer.save()
-         refresh=RefreshToken.for_user(user)
-         res={
-             "refresh": str(refresh),
-             "access": str(refresh.access_token),
-         }
-         return Response({
-             "user":serializer.data,
-             "refresh": res["refresh"],
-             "token": res["access"]
+    serializer_class = RegisterSerializer
+    permission_classes = [AllowAny]
+    http_method_names = ['post']
 
-         },status=status.HTTP_201_CREATED)
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        try:
+            # Validate input data
+            serializer.is_valid(raise_exception=True)
+            
+            # Save the user and generate tokens
+            user = serializer.save()
+            refresh = RefreshToken.for_user(user)
+            res = {
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            }
+            return Response({
+                "user": serializer.data,
+                "refresh": res["refresh"],
+                "token": res["access"]
+            }, status=status.HTTP_201_CREATED)
+
+        except ValidationError as e:
+            # Handle validation errors (e.g., invalid input data)
+            return Response({
+                "errors": e.detail  # Returns detailed error messages from serializer
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            # Handle unexpected errors
+            return Response({
+                "errors": str(e)
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginViewSet(viewsets.ViewSet):
 
